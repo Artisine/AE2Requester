@@ -3,6 +3,12 @@
 local basalt = require("basaltMin")
 local printing = require("utils.printing")
 local inspect     = require("utils.inspect")
+local cryptoNet = require("utils.cryptoNet")
+
+-- local capacityRoot = fs.getCapacity("/")
+-- local freeSpaceRoot = fs.getFreeSpace("/")
+-- print("Root has capacity (bytes): " .. tostring(capacityRoot) .. " - free space (bytes): " .. tostring(freeSpaceRoot))
+
 
 
 local null = {
@@ -180,6 +186,12 @@ local function printTable(t, options)
 end
 
 
+
+-- capacityRoot = fs.getCapacity("/")
+-- freeSpaceRoot = fs.getFreeSpace("/")
+-- print("Root has capacity (bytes): " .. tostring(capacityRoot) .. " - free space (bytes): " .. tostring(freeSpaceRoot))
+
+
 Enum = {
 	Mouse = {
 		LEFT = 1,
@@ -338,17 +350,6 @@ local function apply_overflowScrollingEffectOnElement(textualElement)
 	local todo = "todo something"
 	return
 end
-
-
-
-
-
-
-
-
-
-
-
 local function apply_rightClickToClearTextOnInput(inputElement)
 	assert(inputElement, "Input element is nil")
 	registerEventListenerOnElement("Click", inputElement, function(self, button, x, y)
@@ -833,7 +834,60 @@ btnRequest:onClick(function(self, button, x, y)
 end)
 
 
+-- capacityRoot = fs.getCapacity("/")
+-- freeSpaceRoot = fs.getFreeSpace("/")
+-- print("Root has capacity (bytes): " .. tostring(capacityRoot) .. " - free space (bytes): " .. tostring(freeSpaceRoot))
+
+
+
+
+local function onStart()
+	local socket = cryptoNet.connect("Cinnamon-AE2-ME-Requester")
+	if not socket then
+		print("Failed to connect to server.")
+		return
+	end
+
+	print("Username: ")
+	local username = read()
+	print("Password: ")
+	local password = read("*")
+
+	cryptoNet.login(socket, username, password)
+	return
+end
+local function onEvent(event)
+
+	if event[1] == "login" then
+		-- Successful login event.
+		local username = event[2]
+		local socket = event[3]
+		log("Logged in as: " .. username)
+		cryptoNet.send(socket, "Hello server! I am " .. username .. ".")
+
+		basalt.run()
+	elseif event[1] == "login_failed" then
+		-- Failed login event.
+		local reason = event[2]
+		log("Login failed: " .. reason)
+		print("Login failed: " .. reason)
+
+		cryptoNet.closeAll()
+		return
+	end
+
+	return
+end
+cryptoNet.startEventLoop(onStart, onEvent)
+
+
+
+
+
+
+
+
 print("[Program Executed Successfully]")
-basalt.run()
+-- basalt.run()
 print("[End of Program]")
 -- End of File

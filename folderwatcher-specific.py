@@ -59,13 +59,13 @@ allowlist_to_copy = [
     "*.txt",
     "utils/*.*",
     "*.xml",
-    "*.bimg"
 ]
 excluded_folders = [
     "__pycache__",
     ".git",
     ".mypy_cache",
-    ".vscode"
+    ".vscode",
+    "basalt"
 ]
 
 filestructs = {}

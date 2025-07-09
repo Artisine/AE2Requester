@@ -210,10 +210,10 @@ end
 
 
 local function onStart()
-	print("Server starting...")
+	log("Server starting...")
 	cryptoNet.setLoggingEnabled(false)
 
-	setupGui()
+	-- setupGui()
 
 	cryptoNet.host("Cinnamon-AE2-ME-Requester", false)
 	return
@@ -221,49 +221,27 @@ end
 
 
 local serverIsRunning = false
+local function startCryptoNetServer()
+	log("Starting CryptoNet event loop...")	
+	cryptoNet.startEventLoop(onStart, onEvent)
+	log("CryptoNet Event loop ended.")
+	return
+end
+
 local function startBasalt()
 	log("Starting Basalt runtime...")
-
+	setupGui()
 	basalt.run()
-
 	while basalt.isRunning do
 		os.sleep(0.25)
 	end
 	log("Basalt runtime ended.")
 	serverIsRunning = false
-
 	cryptoNet.closeAll()
-
 	return
 end
-local function startCryptoNetServer()
-	log("Starting CryptoNet event loop...")
-	
-	local thing = cryptoNet.getAllServers()
-	-- logTable(thing, {depth=2})
-	
-	
-	
-	cryptoNet.startEventLoop(onStart, onEvent)
-	log("Event loop started.")
-	log("Doing something.") -- these don't run???
-	-- logTable(thing, {depth=2})
-
-	while basalt.isRunning or serverIsRunning do
-		os.sleep(0.25)
-	end
-
-	print("CryptoNet event loop ended?")
-	local k = 0
-	local MAX_K = 60
-	return
-end
--- basalt.schedule(startCryptoNetServer)
-
+basalt.schedule(startCryptoNetServer)
 serverIsRunning = true
-parallel.waitForAll(startCryptoNetServer, startBasalt)
-
-
--- basalt.run()
+startBasalt()
 print("[End of Server Program]")
 -- End of File
