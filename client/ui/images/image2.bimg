@@ -1,0 +1,35 @@
+{
+  {
+    {
+      "First Line",
+      "0000000000",
+      "ffffffffff",
+    },
+    {
+      "Bimg Image",
+      "dddd0aaaaa",
+      "ffffffffff",
+    },
+  },
+  palette = {
+    {
+      16777215,
+    },
+    [ 32768 ] = {
+      0,
+    },
+    [ 8192 ] = {
+      5744206,
+    },
+    [ 1024 ] = {
+      11691749,
+    },
+  },
+  creator = "Keyboard and Mouse",
+  version = "1.0.0",
+  animation = false,
+  date = "2022-05-30T22:32:24+0000",
+  author = "SkyTheCodeMaster",
+  description = "This is an example of the .bimg format, a universal ComputerCraft image.",
+  title = "Example",
+}

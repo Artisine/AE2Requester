@@ -1,0 +1,5 @@
+<frame name="frame" width="26" height="20" background="${colors.gray}">
+	<label x="2" y="2" text="Hello World!" />
+	<button x="2" y="4" text="Ping!" onClick="whenPing" />
+	<textBox name="input" z="3" x="2" y="11" width="23" height="1" placeholder="Type here..." />
+</frame>

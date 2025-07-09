@@ -1,0 +1,53 @@
+<frame name="pocket_window" width="26" height="20">
+	<frame x="1" y="1" width="26" height="2">
+		<frame background="lightGray" width="26" height="1" x="1" y="1">
+			<label x="2" y="1" foreground="white" text="ME Crafting Requester" />
+		</frame>
+		<frame name="div_status" background="gray" width="26" height="1" x="1" y="2">
+			<label name="label_status" x="1" y="1" foreground="white" text="" />
+		</frame>
+	</frame>
+	<frame visible="true" name="frame_main" x="1" y="3" width="26" height="18" background="${colors.gray}">
+		<input name="input" x="2" y="2" width="24" height="1" 
+		placeholder="Search items here..." />
+		<label name="info" x="2" y="4" foreground="cyan" text="Scroll the list" />
+		<list name="list" x="1" y="5" width="26" height="10"></list>
+		<button name="btn-request" x="16" y="16" width="10" height="1" text=" Request! " background="orange" foreground="gray" />
+
+	</frame>
+	<frame visible="false" name="frame_request" x="1" y="3" width="26" height="18" background="gray">
+		<frame name="div_display" x="1" y="2" width="26" height="3" background="lightGray" foreground="white">
+			<label x="1" y="1" foreground="gray" text="Making:" />
+			<label name="label_item" x="2" y="2" width="23" text="Some Item Name" foreground="white" />
+		</frame>
+
+		<frame name="section_amount" x="1" y="6" width="26" height="13" background="gray">
+			<frame name="div_amount" x="1" y="1" width="26" height="7">
+				<frame name="div_picker_positives" x="2" y="1" width="24" height="3">
+					<button name="label_positive_1" x="1" y="2" width="2" height="1" text="" foreground="white" background="gray" />
+					<button name="label_positive_10" x="6" y="2" width="3" height="1" text="" foreground="white" background="gray" />
+					<button name="label_positive_100" x="12" y="2" width="4" height="1" text="" foreground="white" background="gray" />
+					<button name="label_positive_1000" x="20" y="2" width="5" height="1" text="" foreground="white" background="gray" />
+				</frame>
+				<input name="input_amount" x="2" y="4" width="24" height="1" placeholder="Amount..." placeholderColor="white" foreground="white" background="gray" focusedBackground="cyan" />
+				<frame name="div_picker_negatives" x="2" y="5" width="24" height="3">
+					<button name="label_negative_1" x="1" y="2" width="2" height="1" text="" foreground="white" background="gray" />
+					<button name="label_negative_10" x="6" y="2" width="3" height="1" text="" foreground="white" background="gray" />
+					<button name="label_negative_100" x="12" y="2" width="4" height="1" text="" foreground="white" background="gray" />
+					<button name="label_negative_1000" x="20" y="2" width="5" height="1" text="" foreground="white" background="gray" />
+				</frame>
+			</frame>
+			<label name="label_status" x="2" y="9" width="24" height="1" foreground="red" text="Must be a number" />
+
+			<button name="btn-next" x="18" y="11" width="8" height="1" text=" Next " background="green" foreground="white" />
+			<button name="btn-cancel" x="2" y="13" width="8" height="1" text="Cancel" background="red" foreground="white" />
+		</frame>
+		<frame name="section_confirm" x="1" y="6" width="26" height="13" visible="false" background="gray">
+			<frame name="item_overview" x="1" y="1" width="26" height="9" background="lightGray">
+
+			</frame>
+			<button name="btn-confirm" x="18" y="12" width="8" height="1" text=" Craft! " background="green" foreground="white" />
+			<button name="btn-back" x="2" y="12" width="8" height="1" text="Back" background="orange" foreground="white" />
+		</frame>
+	</frame>
+</frame>
