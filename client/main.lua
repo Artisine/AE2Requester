@@ -18,8 +18,7 @@ local null = {
 local undefined = nil
 
 
--- local bridge = peripherals.ensureMEBridgeExists()
--- if not bridge then return nil end
+
 
 LOG_FILE_PATH = "/Docs/basalt.log"
 -- clear log file
@@ -200,7 +199,7 @@ Enum = {
 	}
 }
 
-
+local thisUserSocket = nil
 
 local main = basalt.getMainFrame()
 
@@ -528,7 +527,7 @@ local function searchList_whenItemSelect(self, index, item)
 	local isShiftDown = metaKeysPressedDown.SHIFT
 	local itemIsSelected = (not not item.selected)
 	-- logTable(self.items)
-	log("Shift is down: " .. tostring(isShiftDown))
+	-- log("Shift is down: " .. tostring(isShiftDown))
 	if isShiftDown and not itemIsSelected then
 		-- This means they selected it, and it deselected - but we want to selected again!
 		log("Shift is down, and item is not selected, selecting it again.")
@@ -537,22 +536,21 @@ local function searchList_whenItemSelect(self, index, item)
 		log(item)
 	end
 
-	itemToMake = list:getSelectedItem()["name"] or list:getSelectedItem()["Name"]
+	local thing = self:getSelectedItem()
+	logTable(thing, {depth=2})
+
+	itemToMake = thing["text"]
+	log("Selected item: " .. tostring(itemToMake))
 
 	return
 end
 do
-	list:addItem("Item 1")
-
-	local alphabet = "abcdefghijklmnopqrstuvwxyz"
-	for i=2,300 do
-		local randomStuff = ""
-		for j=1,math.random(1, 10) do
-			randomStuff = randomStuff .. alphabet:sub(math.random(1, #alphabet), math.random(1, #alphabet))
-		end
-		local itemTextContent = "Item " .. tostring(i) .. " " .. randomStuff
-		list:addItem(itemTextContent)
-	end
+	list:addItem({
+		text = "Nothing here yet...",
+		selected = true,
+		itemName = "minecraft:air",
+		doNotSelectThis = true
+	})
 
 	list:setMultiSelection(false)
 	list:setSelectedBackground(colors.cyan)
@@ -619,6 +617,20 @@ local function whenNextButtonClicked(self, button, x, y)
 	if itemAmountIsValid then
 		section_amount:setVisible(false)
 		section_confirm:setVisible(true)
+
+		if not thisUserSocket then
+			error("No user socket found, cannot proceed to confirmation.")
+			return
+		end
+
+		log("Item to make: " .. itemToMake)
+		log("Amount to make: " .. tostring(amountToMake))
+
+		cryptoNet.send(thisUserSocket, {
+			tag = "materials_bill",
+			itemName = itemToMake,
+			amount = amountToMake
+		})
 	else
 		label_status:setVisible(true)
 		label_status:setText("Must be a number > 0.")
@@ -842,6 +854,7 @@ end)
 
 
 local function onStart()
+	basalt.run()
 	local socket = cryptoNet.connect("Cinnamon-AE2-ME-Requester")
 	if not socket then
 		print("Failed to connect to server.")
@@ -854,6 +867,8 @@ local function onStart()
 	local password = read("*")
 
 	cryptoNet.login(socket, username, password)
+
+	thisUserSocket = socket
 	return
 end
 local function onEvent(event)
@@ -865,7 +880,11 @@ local function onEvent(event)
 		log("Logged in as: " .. username)
 		cryptoNet.send(socket, "Hello server! I am " .. username .. ".")
 
-		basalt.run()
+		cryptoNet.send(socket, {
+			tag = "all_craftable_items"
+		})
+
+		-- basalt.run()
 	elseif event[1] == "login_failed" then
 		-- Failed login event.
 		local reason = event[2]
@@ -874,6 +893,38 @@ local function onEvent(event)
 
 		cryptoNet.closeAll()
 		return
+	elseif event[1] == "connection_closed" then
+		-- Connection closed event.
+		cryptoNet.closeAll()
+		log("Connection closed.")
+		print("Connection closed.")
+		basalt.stop()
+		print("Hold Ctrl+T to terminate the program.")
+		return
+	elseif event[1] == "encrypted_message" then
+		local message = event[2]
+		local socket = event[3]
+		local server = event[4]
+		
+		if message.tag == "all_craftable_items:response" then
+			log("Received all craftable items response from server.")
+			
+			local craftableItems = message["craftableItems"]
+			logTable(craftableItems, {depth=2})
+
+			-- Clear the list and add the items.
+			list:clearItems()
+			for _, item in ipairs(craftableItems) do
+				list:addItem({
+					text = item.displayName,
+					itemName = item.name,
+					selected = false
+				})
+			end
+			list:updateRender()
+			log("Added " .. tostring(#craftableItems) .. " items to the list.")
+		end
+
 	end
 
 	return

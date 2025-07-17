@@ -62,6 +62,9 @@
   - Solution to this, put callback for a single "key" event into a 'broadcast' structure, relay key event to other user-specified callbacks.
 
 
+# Things to do
+- Work out how to make "client", "client-stock" and "server" architecture work.
+  - Currently have the "client" (GUI) and "server" crafter programs defined, but not yet fully functional. Missing the "client-stock" part, and item transport from stock to server, and back server to stock.
 
 
 

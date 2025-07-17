@@ -1,8 +1,7 @@
 
-local cryptoNet = require("/Docs/utils/cryptoNet")
-local basalt = require("/Docs/utils/basaltMin")
-local inspect = require("/Docs/utils/inspect")
-
+local basalt = require("utils/basaltMin")
+local inspect = require("utils/inspect")
+local peripherals = require("utils.peripherals")
 
 
 LOG_FILE_PATH = "/Docs/basalt.log"
@@ -122,8 +121,14 @@ end
 local basaltError = basalt.LOGGER.error
 local basaltDebug = basalt.LOGGER.debug
 print = function(...)
-	DEFAULT_PRINT(...)
+	-- DEFAULT_PRINT(...)
 	log(...)
+end
+_G.print = function(...)
+	-- Intentionally do nothing, because
+	--   do not want to print to terminal
+	-- Use log functions instead!
+	return nil
 end
 
 
@@ -170,6 +175,22 @@ local function printTable(t, options)
 end
 
 
+local bridge = peripherals.ensureMEBridgeExists()
+if not bridge then
+	log("No ME Bridge found, cannot proceed.")
+	basaltError("No ME Bridge found, cannot proceed.")
+	return nil
+end
+
+-- Modify the cryptoNet Lua script to replace its log and print functions
+-- with this file's log and print functions.
+-- Requires editing the Lua script dynamically.
+-- Dynamically patch cryptoNet's source to replace its local log/print functions with this file's versions
+local cryptoNet = require("utils/cryptoNet")
+
+
+
+
 
 
 local function setupGui()
@@ -196,26 +217,116 @@ end
 
 
 
+
+---comment
+---@param message_table table
+local function handle_meBridge_messages(message_table, socket, server)
+	local message = message_table
+	if message.tag == "materials_bill" then
+		---@type {tag: string, itemName: string, amount: number}
+		message = message
+		local itemFilter = {
+			name = message.itemName,
+			count = message.amount
+		}
+		---@type boolean
+		local isItemCraftable = bridge.isItemCraftable(itemFilter)
+		if isItemCraftable then
+			log("Item " .. message.itemName .. " with amount " .. message.amount .. " is craftable.")
+		else
+			log("Item " .. message.itemName .. " with amount " .. message.amount .. " is NOT craftable.")
+		end
+
+	elseif message.tag == "all_craftable_items" then
+		local craftableItems = bridge.listCraftableItems()
+		log("Received all craftable items from ME Bridge.")
+		log("Craftable items total: " .. tostring(#craftableItems))
+		cryptoNet.send(socket, {
+			tag = "all_craftable_items:response",
+			craftableItems = craftableItems
+		})
+		log("Sent list to socket " .. tostring(socket.username or "??") .. ".")
+	else
+		log("Unknown message tag: " .. tostring(message.tag))
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local function process_message_string(message_string, socket, server)
+
+	return
+end
+
+local function process_message_table(message_table, socket, server)
+	handle_meBridge_messages(message_table, socket, server)
+		
+	return
+end
+
+
+
+
+
 --- @alias CryptoNetEvent [string, table, table | string]
 
 --- @param event CryptoNetEvent
 local function onEvent(event)
 	if event[1] == "login" then
-		local socket = event[2]
-		local username = socket.username
-		print("Login event received, user " .. tostring(username) .. " connected.")
+		local username = event[2]
+		local socket = event[3]
+		log("Login event received, user " .. tostring(username) .. " connected.")
 	end
+
+	if event[1] == "encrypted_message" then
+		local message = event[2]
+		local socket = event[3]
+		local server = event[4]
+		if type(message) == "string" then
+			process_message_string(message, socket, server)
+		elseif type(message) == "table" then
+			process_message_table(message, socket, server)
+		else
+			log("Unknown message type: " .. type(message))
+			return
+		end
+	end
+
 	return
 end
 
 
 local function onStart()
 	log("Server starting...")
-	cryptoNet.setLoggingEnabled(false)
+	cryptoNet.setLoggingEnabled(true)
 
 	-- setupGui()
 
-	cryptoNet.host("Cinnamon-AE2-ME-Requester", false)
+	local server = cryptoNet.host(
+		"Cinnamon-AE2-ME-Requester",
+		false,
+		false,
+		"top",
+		"Cinnamon-AE2-ME-Requester.crt",
+		"Cinnamon-AE2-ME-Requester_private.key",
+		"Cinnamon-AE2-ME-Requester_users.tbl"
+	)
+
+	log("CryptoNet server started on port " .. tostring(server.channel) .. ".")
 	return
 end
 
