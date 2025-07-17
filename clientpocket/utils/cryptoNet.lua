@@ -1,3 +1,12 @@
+---@diagnostic disable: undefined-global
+---@diagnostic disable: duplicate-set-field
+---@diagnostic disable: deprecated
+---@diagnostic disable: cast-local-type
+---@diagnostic disable: need-check-nil
+---@diagnostic disable: param-type-mismatch
+---@diagnostic disable: lowercase-global
+---@diagnostic disable: unused-local
+---@diagnostic disable: undefined-field
 -- CryptoNet Networking Framework by SiliconSloth
 -- Licensed under the MIT license.
 --
