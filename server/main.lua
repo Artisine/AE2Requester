@@ -245,6 +245,10 @@ local function handle_meBridge_messages(message_table, socket, server)
 			craftableItems = craftableItems
 		})
 		log("Sent list to socket " .. tostring(socket.username or "??") .. ".")
+	elseif message.tag == "request_craft_order" then
+		local itemName = message.itemName
+		local amount = message.amount
+		-- do things here, step "Begin crafting order"
 	else
 		log("Unknown message tag: " .. tostring(message.tag))
 	end

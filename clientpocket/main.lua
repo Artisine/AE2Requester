@@ -643,6 +643,12 @@ local function whenConfirmButtonClicked(self, button, x, y)
 		-- do things here
 		log("valid item count, do things here.")
 		log("User wants to make ".. itemToMake .. " x".. tostring(amountToMake) .. " ...")
+
+		cryptoNet.send(thisUserSocket, {
+			tag = "request_craft_order",
+			itemName = itemToMake,
+			amount = amountToMake
+		})
 	else
 		log("Do nothing, because invalid item count.")
 	end
@@ -854,7 +860,6 @@ end)
 
 
 local function onStart()
-	basalt.run()
 	local socket = cryptoNet.connect("Cinnamon-AE2-ME-Requester")
 	if not socket then
 		print("Failed to connect to server.")
@@ -869,6 +874,8 @@ local function onStart()
 	cryptoNet.login(socket, username, password)
 
 	thisUserSocket = socket
+
+	basalt.run()
 	return
 end
 local function onEvent(event)
@@ -913,7 +920,7 @@ local function onEvent(event)
 			logTable(craftableItems, {depth=2})
 
 			-- Clear the list and add the items.
-			list:clearItems()
+			list:clear()
 			for _, item in ipairs(craftableItems) do
 				list:addItem({
 					text = item.displayName,
