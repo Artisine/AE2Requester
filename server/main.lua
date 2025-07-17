@@ -1,7 +1,7 @@
 
 local basalt = require("utils/basaltMin")
 local inspect = require("utils/inspect")
-local peripherals = require("utils.peripherals")
+local peripherals = require("utils.meBridge")
 
 
 LOG_FILE_PATH = "/Docs/basalt.log"
