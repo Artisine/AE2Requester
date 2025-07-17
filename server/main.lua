@@ -191,8 +191,6 @@ local cryptoNet = require("utils/cryptoNet")
 
 
 
-
-
 local function setupGui()
 	local main = basalt.getMainFrame():setBackground(colors.gray):setSize(51, 19)
 	local label_hello = main:addLabel("label_hello"):setText("Hello, world!"):setPosition(4, 4):setSize(20, 3):setForeground(colors.white)
@@ -230,7 +228,7 @@ local function handle_meBridge_messages(message_table, socket, server)
 			count = message.amount
 		}
 		---@type boolean
-		local isItemCraftable = bridge.isItemCraftable(itemFilter)
+		local isItemCraftable = bridge:isItemCraftable(itemFilter)
 		if isItemCraftable then
 			log("Item " .. message.itemName .. " with amount " .. message.amount .. " is craftable.")
 		else
@@ -238,7 +236,7 @@ local function handle_meBridge_messages(message_table, socket, server)
 		end
 
 	elseif message.tag == "all_craftable_items" then
-		local craftableItems = bridge.listCraftableItems()
+		local craftableItems = bridge:listCraftableItems()
 		log("Received all craftable items from ME Bridge.")
 		log("Craftable items total: " .. tostring(#craftableItems))
 		cryptoNet.send(socket, {
