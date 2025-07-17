@@ -1,8 +1,9 @@
 """
 
-Copies contents of "client" folder into CLIENT folder, defined later.
+Copies contents of "clientpocket" folder into CLIENTPOCKET folder, defined later.
+Copies contents of "clientstock" folder into CLIENTSTOCK folder, defined later.
 Copies contents of "server" folder into SERVER folder, defined later.
-Watches for changes in the "client" and "server" folders and updates the CLIENT and SERVER folders accordingly.
+Watches for changes in the "clientpocket", "clientstock" and "server" folders and updates the CLIENTPOCKET, CLIENTSTOCK and SERVER folders accordingly.
 
 """
 import argparse
@@ -23,27 +24,33 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.text import Text
 
-TARGET_SERVER_FOLDER_PATH = "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\0\\Docs"
-TARGET_CLIENT_FOLDER_PATH = "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\2\\Docs"
+TARGET_SERVER_FOLDER_PATH = "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\3\\Docs"
+TARGET_CLIENTPOCKET_FOLDER_PATH = "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\2\\Docs"
+TARGET_CLIENTSTOCK_FOLDER_PATH = "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\0\\Docs"
 
 print("TARGET_SERVER_FOLDER_PATH:", TARGET_SERVER_FOLDER_PATH)
-print("TARGET_CLIENT_FOLDER_PATH:", TARGET_CLIENT_FOLDER_PATH)
-
+print("TARGET_CLIENTPOCKET_FOLDER_PATH:", TARGET_CLIENTPOCKET_FOLDER_PATH)
+print("TARGET_CLIENTSTOCK_FOLDER_PATH:", TARGET_CLIENTSTOCK_FOLDER_PATH)
 
 # Define the source folders
 SOURCE_SERVER_FOLDER_PATH = "./server"
-SOURCE_CLIENT_FOLDER_PATH = "./client"
+SOURCE_CLIENTPOCKET_FOLDER_PATH = "./clientpocket"
+SOURCE_CLIENTSTOCK_FOLDER_PATH = "./clientstock"
+
 path_source_server = pathlib.Path(SOURCE_SERVER_FOLDER_PATH)
-path_source_client = pathlib.Path(SOURCE_CLIENT_FOLDER_PATH)
+path_source_clientpocket = pathlib.Path(SOURCE_CLIENTPOCKET_FOLDER_PATH)
+path_source_clientstock = pathlib.Path(SOURCE_CLIENTSTOCK_FOLDER_PATH)
 
 # Define the target folders
 path_target_server = pathlib.Path(TARGET_SERVER_FOLDER_PATH)
-path_target_client = pathlib.Path(TARGET_CLIENT_FOLDER_PATH)
+path_target_clientpocket = pathlib.Path(TARGET_CLIENTPOCKET_FOLDER_PATH)
+path_target_clientstock = pathlib.Path(TARGET_CLIENTSTOCK_FOLDER_PATH)
 
 # Ensure the target folders exist
 
 path_target_server.mkdir(parents=True, exist_ok=True)
-path_target_client.mkdir(parents=True, exist_ok=True)
+path_target_clientpocket.mkdir(parents=True, exist_ok=True)
+path_target_clientstock.mkdir(parents=True, exist_ok=True)
 
 # --- Begin FolderWatcher Functionality ---
 console = Console()
@@ -106,7 +113,7 @@ def mainThread_timersManager():
                 fileStructToUse = filestructs[file_path]
                 copyFileToTargetFolder(fileStructToUse)
                 fileNameToUse = (fileStructToUse.sourceShort + "/" + fileStructToUse.filename.as_posix()) if fileStructToUse.sourceShort else file_path
-                print(f"Timer {fileNameToUse} has expired, hence copied file over.")
+                # print(f"Timer {fileNameToUse} has expired, hence copied file over.")
                 with timers_lock:
                     del timers[file_path]
                     del filestructs[file_path]
@@ -174,32 +181,41 @@ class CustomEventHandler(FileSystemEventHandler):
 
 # Start the watcher for both client and server folders
 def start_watchers():
-    event_handler_client = CustomEventHandler(
-        str(path_source_client.resolve()), str(path_target_client.resolve()), "vscode client", "MC CCT Client"
+    event_handler_clientpocket = CustomEventHandler(
+        str(path_source_clientpocket.resolve()), str(path_target_clientpocket.resolve()), "vscode client", "MC CCT ClientPocket"
+    )
+    event_handler_clientstock = CustomEventHandler(
+        str(path_source_clientstock.resolve()), str(path_target_clientstock.resolve()), "vscode client", "MC CCT ClientStock"
     )
     event_handler_server = CustomEventHandler(
         str(path_source_server.resolve()), str(path_target_server.resolve()), "vscode server", "MC CCT Server"
     )
-    observer_client = Observer()
+    observer_clientpocket = Observer()
+    observer_clientstock = Observer()
     observer_server = Observer()
-    observer_client.schedule(event_handler_client, str(path_source_client.resolve()), recursive=True)
+    observer_clientpocket.schedule(event_handler_clientpocket, str(path_source_clientpocket.resolve()), recursive=True)
+    observer_clientstock.schedule(event_handler_clientstock, str(path_source_clientstock.resolve()), recursive=True)
     observer_server.schedule(event_handler_server, str(path_source_server.resolve()), recursive=True)
-    observer_client.start()
+    observer_clientpocket.start()
+    observer_clientstock.start()
     observer_server.start()
-    print(f"Monitoring client: {path_source_client.resolve()}")
+    print(f"Monitoring client pocket: {path_source_clientpocket.resolve()}")
+    print(f"Monitoring client stock: {path_source_clientstock.resolve()}")
     print(f"Monitoring server: {path_source_server.resolve()}")
     thread_mainTimerManager = threading.Thread(target=mainThread_timersManager, daemon=True)
     thread_secondaryTimerDecrementer = threading.Thread(target=timer_thread, daemon=True)
     thread_mainTimerManager.start()
     thread_secondaryTimerDecrementer.start()
     try:
-        while observer_client.is_alive() and observer_server.is_alive():
-            observer_client.join(1)
+        while observer_clientpocket.is_alive() and observer_clientstock.is_alive() and observer_server.is_alive():
+            observer_clientpocket.join(1)
+            observer_clientstock.join(1)
             observer_server.join(1)
             time.sleep(0.1)
     except KeyboardInterrupt:
         print("Stopping folder watcher...")
-        observer_client.stop()
+        observer_clientpocket.stop()
+        observer_clientstock.stop()
         observer_server.stop()
         timers_event.set()
     finally:
@@ -207,9 +223,11 @@ def start_watchers():
         time.sleep(0.25)
         thread_mainTimerManager.join()
         thread_secondaryTimerDecrementer.join()
-        observer_client.stop()
+        observer_clientpocket.stop()
+        observer_clientstock.stop()
         observer_server.stop()
-        observer_client.join()
+        observer_clientpocket.join()
+        observer_clientstock.join()
         observer_server.join()
         print("Folder watcher stopped.")
 

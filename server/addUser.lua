@@ -1,3 +1,4 @@
+---@diagnostic disable-next-line: different-requires
 local cryptoNet = require("utils.cryptoNet")
 
 cryptoNet.host("Cinnamon-AE2-ME-Requester")
@@ -14,6 +15,7 @@ while pass_val == "" do
 	term.write("Confirm Password: ")
 	local confirm = read("*")
 	if password == confirm then
+		---@cast password string
 		pass_val = password
 	else
 		print("Passwords do not match. Please try again.")

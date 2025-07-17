@@ -186,6 +186,7 @@ end
 -- with this file's log and print functions.
 -- Requires editing the Lua script dynamically.
 -- Dynamically patch cryptoNet's source to replace its local log/print functions with this file's versions
+---@diagnostic disable-next-line: different-requires
 local cryptoNet = require("utils/cryptoNet")
 
 

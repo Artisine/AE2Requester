@@ -3,6 +3,7 @@
 local basalt = require("basaltMin")
 local printing = require("utils.printing")
 local inspect     = require("utils.inspect")
+---@diagnostic disable-next-line: different-requires
 local cryptoNet = require("utils.cryptoNet")
 
 -- local capacityRoot = fs.getCapacity("/")
