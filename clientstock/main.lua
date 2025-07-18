@@ -13,6 +13,16 @@ local cryptoNet = require("utils.cryptoNet")
 log:info("Starting the server...")
 log:warn("awooga")
 
+local function handle_meBridge_messages_clientstock(message_table, socket, server)
+	local message = message_table
+
+	return
+end
+local function process_message_table(message_table, socket, server)
+	handle_meBridge_messages_clientstock(message_table, socket, server)
+	return
+end
+
 
 local thisUserSocket = nil
 local function onStart()
@@ -37,14 +47,19 @@ local function onEvent(event)
 		log:info("User logged in as " .. username .. " successfully.")
 		cryptoNet.send(socket, "Hello from clientstock!")
 
+		cryptoNet.send(socket, {
+			tag = "indicate_role",
+			role = "client_stock"
+		})
+
 	elseif event[1] == "login_failed" then
 		local reason = event[2]
 		log:error("Login failed: " .. reason)
 		print("Login failed: " .. reason)
 	elseif event[1] == "connection_closed" then
 		local reason = event[2]
-		log:warn("Connection closed: " .. reason)
-		print("Connection closed: " .. reason)
+		log:warn("Connection closed: " .. textutils.serialise(reason))
+		print("Connection closed: " .. textutils.serialise(reason))
 	elseif event[1] == "encrypted_message" then
 		local message = event[2]
 		local socket = event[3]

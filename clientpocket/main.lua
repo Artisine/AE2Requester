@@ -885,6 +885,12 @@ local function onEvent(event)
 		local username = event[2]
 		local socket = event[3]
 		log("Logged in as: " .. username)
+
+		cryptoNet.send(socket, {
+			tag = "indicate_role",
+			role = "client_pocket"
+		})
+
 		cryptoNet.send(socket, "Hello server! I am " .. username .. ".")
 
 		cryptoNet.send(socket, {

@@ -207,15 +207,24 @@ end
 
 
 
+local function array_includes(array, value)
+	for _, v in ipairs(array) do
+		if v == value then
+			return true
+		end
+	end
+	return false
+end
 
 
 
-
-
-
-
-
-
+local usernames_roles_sockets = {
+	["BobTheBuilder"] = {
+		["client_pocket"] = "some_long_id_1",
+		["client_stock"] = "some_long_id_2"
+	}
+}
+local valid_roles = {"client_pocket", "client_stock"}
 
 ---comment
 ---@param message_table table
@@ -249,6 +258,32 @@ local function handle_meBridge_messages(message_table, socket, server)
 		local itemName = message.itemName
 		local amount = message.amount
 		-- do things here, step "Begin crafting order"
+	elseif message.tag == "indicate_role" then
+
+		-- log("Message:")
+		-- logTable(message)
+		-- log("\n")
+		-- log("Socket:")
+		-- logTable(socket)
+		-- log("\n")
+		-- log("Server:")
+		-- logTable(server)
+
+		local role = message.role
+		log("Client indicated role: " .. tostring(role))
+		if not role or not array_includes(valid_roles, role) then
+			log("Invalid role: " .. tostring(role))
+			return
+		end
+
+		--[[ Section: Update the usernames_roles_sockets table ]]
+		if not usernames_roles_sockets[socket.username] then
+			usernames_roles_sockets[socket.username] = {}
+		end
+		usernames_roles_sockets[socket.username][role] = socket.target
+		log("User " .. tostring(socket.username) .. " set to role: " .. tostring(role))
+		logTable(usernames_roles_sockets)
+
 	else
 		log("Unknown message tag: " .. tostring(message.tag))
 	end
