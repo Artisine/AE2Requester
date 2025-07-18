@@ -220,8 +220,14 @@ end
 
 local usernames_roles_sockets = {
 	["BobTheBuilder"] = {
-		["client_pocket"] = "some_long_id_1",
-		["client_stock"] = "some_long_id_2"
+		["client_pocket"] = {
+			["id"] = "some_long_id_1",
+			["socket"] = {} -- the socket object
+		},
+		["client_stock"] = {
+			["id"] = "some_long_id_2",
+			["socket"] = {} -- the socket object
+		}
 	}
 }
 local valid_roles = {"client_pocket", "client_stock"}
@@ -280,7 +286,10 @@ local function handle_meBridge_messages(message_table, socket, server)
 		if not usernames_roles_sockets[socket.username] then
 			usernames_roles_sockets[socket.username] = {}
 		end
-		usernames_roles_sockets[socket.username][role] = socket.target
+		usernames_roles_sockets[socket.username][role] = {
+			id = socket.target,
+			socket = socket
+		}
 		log("User " .. tostring(socket.username) .. " set to role: " .. tostring(role))
 		logTable(usernames_roles_sockets)
 
