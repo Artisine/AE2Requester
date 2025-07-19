@@ -15,6 +15,7 @@ function SimpleLogger.new(logfile)
     })
 end
 
+---@diagnostic disable-next-line: duplicate-doc-alias
 ---@alias T_InspectOptions {depth?: number, newline?: string, indent?: string, process?: fun(value: any): any}
 
 local defaultTableInspectOptions = {
