@@ -20,7 +20,7 @@ local undefined = nil
 
 
 
-LOG_FILE_PATH = "/Docs/basalt.log"
+LOG_FILE_PATH = "/Docs/clientpocket-basalt.log"
 -- clear log file
 local file = fs.open(LOG_FILE_PATH, "w")
 if file then
@@ -875,7 +875,6 @@ local function onStart()
 
 	thisUserSocket = socket
 
-	basalt.run()
 	return
 end
 local function onEvent(event)
@@ -897,7 +896,15 @@ local function onEvent(event)
 			tag = "all_craftable_items"
 		})
 
-		-- basalt.run()
+		basalt.run()
+
+		list:addItem({
+			text = "Click the UI !!!",
+			itemName = "minecraft:air",
+			selected = true
+		})
+		list:updateRender()
+		main:updateRender()
 	elseif event[1] == "login_failed" then
 		-- Failed login event.
 		local reason = event[2]

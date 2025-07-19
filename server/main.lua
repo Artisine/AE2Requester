@@ -4,7 +4,7 @@ local inspect = require("utils/inspect")
 local peripherals = require("utils.meBridge")
 
 
-LOG_FILE_PATH = "/Docs/basalt.log"
+LOG_FILE_PATH = "/Docs/server-basalt.log"
 -- clear log file
 local file = fs.open(LOG_FILE_PATH, "w")
 if file then
