@@ -22,7 +22,7 @@ local label_topLeft = frame_topLeft:addLabel()
 local frame_program = main:addFrame():setSize(26,19):setPosition(26,1):setBackground(colors.gray)
 local element_program = frame_program:addProgram():setSize(26,19):setPosition(1,1)
 
-element_program:execute("testloop.lua")
+element_program:execute("testc.lua")
 
 
 local exampleTable = {
