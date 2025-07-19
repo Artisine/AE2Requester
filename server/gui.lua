@@ -35,7 +35,7 @@ local exampleTable = {
 }
 
 
-log(element_program, exampleTable, Logger.InspectOptions({depth=1, indent="\t"}))
+log(element_program, 1, 2, "awooga", true, nil, false, "a", exampleTable, Logger.InspectOptions({depth=1, indent="\t"}))
 -- Yes, in Lua a function can take both named and variadic arguments.
 -- Named arguments are typically passed as a table, and variadic arguments use ...
 -- Example:

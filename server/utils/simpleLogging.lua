@@ -70,10 +70,13 @@ function SimpleLogger:_write(level, ...)
     -- else case implicitly handled
 
     local outputBuffer = ""
-    for i, arg in ipairs(args) do
+    for i=1, #args do
+        local arg = args[i]
         -- print("Processing argument %d: %s", i, tostring(arg))
         if type(arg) == "table" then
             outputBuffer = outputBuffer .. inspect.inspect(arg, tableInspectOptions)
+        -- elseif arg == nil then
+        --     outputBuffer = outputBuffer .. "nil"
         else
             outputBuffer = outputBuffer .. tostring(arg)
         end
