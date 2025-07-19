@@ -1,7 +1,7 @@
 
 local basalt = require("utils/basaltMin")
 local inspect = require("utils/inspect")
-local peripherals = require("utils.meBridge")
+local meBridge = require("utils.meBridge")
 
 
 LOG_FILE_PATH = "/Docs/server-basalt.log"
@@ -175,7 +175,7 @@ local function printTable(t, options)
 end
 
 
-local bridge = peripherals.ensureMEBridgeExists()
+local bridge = meBridge.ensureMEBridgeExists()
 if not bridge then
 	log("No ME Bridge found, cannot proceed.")
 	basaltError("No ME Bridge found, cannot proceed.")
@@ -230,6 +230,22 @@ local usernames_roles_sockets = {
 		}
 	}
 }
+local function getRoleOfSocket(socket)
+	for username, roles in pairs(usernames_roles_sockets) do
+		for role, info in pairs(roles) do
+			if info.socket == socket then
+				return role
+			end
+		end
+	end
+	return nil
+end
+local function getSocketByRole(username, role)
+	if usernames_roles_sockets[username] and usernames_roles_sockets[username][role] then
+		return usernames_roles_sockets[username][role].socket
+	end
+	return nil
+end
 local valid_roles = {"client_pocket", "client_stock"}
 
 ---comment
@@ -264,6 +280,25 @@ local function handle_meBridge_messages(message_table, socket, server)
 		local itemName = message.itemName
 		local amount = message.amount
 		-- do things here, step "Begin crafting order"
+
+		local stockSocket = getSocketByRole(socket.username, "client_stock")
+		if not stockSocket then
+			log("No client_stock socket found for user " .. tostring(socket.username))
+			return
+		end
+		cryptoNet.send(stockSocket, {
+			tag = "query_materials_can_craft_happen",
+			itemName = itemName,
+			amount = amount,
+		})
+	elseif message.tag == "query_materials_can_craft_happen:response" then
+		local canCraft = message.canCraft
+		if canCraft then
+			log("Crafting is possible for item " .. message.itemName .. " (x" .. message.amount .. ").")
+		else
+			log("Crafting is NOT possible for item " .. message.itemName .. " (x" .. message.amount .. ").")
+		end
+
 	elseif message.tag == "indicate_role" then
 
 		-- log("Message:")

@@ -858,6 +858,33 @@ end)
 
 
 
+local function handle_meBridge_messages_clientpocket(message, socket, server)
+	if message.tag == "all_craftable_items:response" then
+		log("Received all craftable items response from server.")
+		
+		local craftableItems = message["craftableItems"]
+		logTable(craftableItems, {depth=2})
+
+		-- Clear the list and add the items.
+		list:clear()
+		for _, item in ipairs(craftableItems) do
+			list:addItem({
+				text = item.displayName,
+				itemName = item.name,
+				selected = false
+			})
+		end
+		list:updateRender()
+		log("Added " .. tostring(#craftableItems) .. " items to the list.")
+	end
+	return
+end
+local function process_message_table(message, socket, server)
+	handle_meBridge_messages_clientpocket(message, socket, server)
+	return
+end
+
+
 
 local function onStart()
 	local socket = cryptoNet.connect("Cinnamon-AE2-ME-Requester")
@@ -925,25 +952,12 @@ local function onEvent(event)
 		local message = event[2]
 		local socket = event[3]
 		local server = event[4]
-		
-		if message.tag == "all_craftable_items:response" then
-			log("Received all craftable items response from server.")
-			
-			local craftableItems = message["craftableItems"]
-			logTable(craftableItems, {depth=2})
 
-			-- Clear the list and add the items.
-			list:clear()
-			for _, item in ipairs(craftableItems) do
-				list:addItem({
-					text = item.displayName,
-					itemName = item.name,
-					selected = false
-				})
-			end
-			list:updateRender()
-			log("Added " .. tostring(#craftableItems) .. " items to the list.")
+		if type(message) == "table" then
+			process_message_table(message, socket, server)
 		end
+		
+		
 
 	end
 

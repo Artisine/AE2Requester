@@ -2,6 +2,13 @@
 local Logger = require("utils.simpleLogging")
 local log = Logger.new("/Docs/clientstock.log")
 local cryptoNet = require("utils.cryptoNet")
+local meBridge = require("utils.meBridge")
+local bridge = meBridge.ensureMEBridgeExists()
+if not bridge then
+	log:error("Failed to ensure ME Bridge exists. Exiting.")
+	error("Failed to ensure ME Bridge exists. Exiting.")
+	return
+end
 
 -- DEFAULT_PRINT = print
 -- print = function(...)
@@ -15,6 +22,21 @@ log:warn("awooga")
 
 local function handle_meBridge_messages_clientstock(message_table, socket, server)
 	local message = message_table
+
+	if message.tag == "query_materials_can_craft_happen" then
+		local canCraft = bridge:isItemCraftable({
+			name = message.itemName,
+			count = message.amount
+		})
+		local response = {
+			tag = "query_materials_can_craft_happen:response",
+			canCraft = canCraft,
+			itemName = message.itemName,
+			amount = message.amount
+		}
+		cryptoNet.send(socket, response)
+	end
+
 
 	return
 end
@@ -64,6 +86,10 @@ local function onEvent(event)
 		local message = event[2]
 		local socket = event[3]
 		local server = event[4]
+
+		if type(message) == "table" then
+			process_message_table(message, socket, server)
+		end
 
 		print(message)
 	end
