@@ -26,7 +26,8 @@ local function handle_meBridge_messages_clientstock(message_table, socket, serve
 	if message.tag == "query_materials_can_craft_happen" then
 		local canCraft = bridge:isItemCraftable({
 			name = message.itemName,
-			count = message.amount
+			count = message.amount,
+			fingerprint = message.fingerprint
 		})
 		local response = {
 			tag = "query_materials_can_craft_happen:response",

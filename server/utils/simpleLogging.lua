@@ -60,7 +60,7 @@ function SimpleLogger:_write(level, ...)
         local lastArg = args[#args]
         -- check meta key "__type" to see if it is T_InspectOptions
         -- getmetatable(lastArg)  -- This will throw an error if lastArg is not a table
-        if getmetatable(lastArg).__type == "T_InspectOptions" then
+        if getmetatable(lastArg) ~= nil and getmetatable(lastArg).__type == "T_InspectOptions" then
             tableInspectOptions = lastArg
             -- remove lastArg from args because we don't want to log the actual options table
             table.remove(args, #args)

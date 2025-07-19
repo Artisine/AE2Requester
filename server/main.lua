@@ -218,6 +218,43 @@ end
 
 
 
+
+
+
+
+
+-- Not a full script, but the core recursive idea:
+local function getRawMaterials(meBridge, itemName, amount)
+	local recipe = meBridge:getPattern({
+		name = itemName,
+		count = amount
+	})
+	if not recipe then 
+		log("No recipe found for item: " .. itemName)
+		return {[itemName] = amount}
+	end
+	local materials = {}
+
+	local requiredInputs = recipe.inputs
+
+	for _, ingredient in ipairs(requiredInputs) do
+		local sub = getRawMaterials(meBridge, ingredient.name, ingredient.count * amount)
+		for k, v in pairs(sub) do
+			materials[k] = (materials[k] or 0) + v
+		end
+	end
+	return materials
+end
+
+
+
+
+
+
+
+
+
+
 local usernames_roles_sockets = {
 	["BobTheBuilder"] = {
 		["client_pocket"] = {
@@ -279,6 +316,7 @@ local function handle_meBridge_messages(message_table, socket, server)
 	elseif message.tag == "request_craft_order" then
 		local itemName = message.itemName
 		local amount = message.amount
+		local fingerprint = message.fingerprint
 		-- do things here, step "Begin crafting order"
 
 		local stockSocket = getSocketByRole(socket.username, "client_stock")
@@ -290,6 +328,7 @@ local function handle_meBridge_messages(message_table, socket, server)
 			tag = "query_materials_can_craft_happen",
 			itemName = itemName,
 			amount = amount,
+			fingerprint = fingerprint
 		})
 	elseif message.tag == "query_materials_can_craft_happen:response" then
 		local canCraft = message.canCraft

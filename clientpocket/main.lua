@@ -517,7 +517,9 @@ end
 
 local list = frame_main:getChild("list")
 assert(list, "List 'list' not found in frame_main.")
-local itemToMake = ""
+local itemToMake_registryName = ""
+local itemToMake_displayName = ""
+local itemToMake_fingerprint = ""
 
 local function searchList_whenItemSelect(self, index, item)
 	-- logTable(self, {depth=1})
@@ -539,8 +541,10 @@ local function searchList_whenItemSelect(self, index, item)
 	local thing = self:getSelectedItem()
 	logTable(thing, {depth=2})
 
-	itemToMake = thing["text"]
-	log("Selected item: " .. tostring(itemToMake))
+	itemToMake_displayName = thing["text"]
+	itemToMake_registryName = thing["itemName"]
+	itemToMake_fingerprint = thing["fingerprint"]
+	log("Selected item: " .. tostring(itemToMake_registryName) .. " (fingerprint: " .. tostring(itemToMake_fingerprint) .. ")")
 
 	return
 end
@@ -623,12 +627,12 @@ local function whenNextButtonClicked(self, button, x, y)
 			return
 		end
 
-		log("Item to make: " .. itemToMake)
+		log("Item to make: " .. itemToMake_registryName)
 		log("Amount to make: " .. tostring(amountToMake))
 
 		cryptoNet.send(thisUserSocket, {
 			tag = "materials_bill",
-			itemName = itemToMake,
+			itemName = itemToMake_registryName,
 			amount = amountToMake
 		})
 	else
@@ -642,12 +646,13 @@ local function whenConfirmButtonClicked(self, button, x, y)
 	if itemAmountIsValid then
 		-- do things here
 		log("valid item count, do things here.")
-		log("User wants to make ".. itemToMake .. " x".. tostring(amountToMake) .. " ...")
+		log("User wants to make ".. itemToMake_registryName .. " x".. tostring(amountToMake) .. " ...")
 
 		cryptoNet.send(thisUserSocket, {
 			tag = "request_craft_order",
-			itemName = itemToMake,
-			amount = amountToMake
+			itemName = itemToMake_registryName,
+			amount = amountToMake,
+			fingerprint = itemToMake_fingerprint
 		})
 	else
 		log("Do nothing, because invalid item count.")
@@ -834,22 +839,24 @@ do
 	apply_deleteKeyOnInput(input_amount)
 	apply_ctrlWordSkipping(input_amount)
 end
+local function whenMainscreenRequestButtonClicked(self, button, x, y)
+	frame_main:setVisible(false)
+	frame_request:setVisible(true)
+	input_amount:setText("1")
 
+	label_itemName:setText(itemToMake_displayName)
+	return
+end
 
 
 local btnConfirm = section_confirm:getChild("btn-confirm"); assert(btnConfirm, "Button 'btn-confirm' not found in frame_request.")
 local btnBack = section_confirm:getChild("btn-back"); assert(btnBack, "Button 'btn-back' not found in frame_request.")
-btnBack:onClick(whenBackButtonClicked)
-btnConfirm:onClick(whenConfirmButtonClicked)
 do
+	btnBack:onClick(whenBackButtonClicked)
 	btnBack:setText(" < Back ")
+	btnConfirm:onClick(whenConfirmButtonClicked)
+	btnRequest:onClick(whenMainscreenRequestButtonClicked)
 end
-
-btnRequest:onClick(function(self, button, x, y)
-	frame_main:setVisible(false)
-	frame_request:setVisible(true)
-	input_amount:setText("1")
-end)
 
 
 -- capacityRoot = fs.getCapacity("/")
@@ -871,6 +878,7 @@ local function handle_meBridge_messages_clientpocket(message, socket, server)
 			list:addItem({
 				text = item.displayName,
 				itemName = item.name,
+				fingerprint = item.fingerprint,
 				selected = false
 			})
 		end
