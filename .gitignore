@@ -1,2 +1,17 @@
 .mypy_cache
 .vscode
+clientpocket/utils/arrayMethods.lua
+clientpocket/utils/cryptoNet.lua
+clientpocket/utils/inspect.lua
+clientpocket/utils/meBridge.lua
+clientpocket/utils/simpleLogging.lua
+clientstock/utils/arrayMethods.lua
+clientstock/utils/cryptoNet.lua
+clientstock/utils/inspect.lua
+clientstock/utils/meBridge.lua
+clientstock/utils/simpleLogging.lua
+server/utils/arrayMethods.lua
+server/utils/cryptoNet.lua
+server/utils/inspect.lua
+server/utils/meBridge.lua
+server/utils/simpleLogging.lua

@@ -1,0 +1,46 @@
+{
+	"project": {
+		"name": "AE2Requester",
+		"version": "1.0.0",
+		"author": "Cinnamon",
+		"description": "A system for requesting autocrafting of items across different distinct AE2 ME networks, where one network is a deliberate requester and the other is a provider."
+	},
+	"filesync": {
+		"source_folders": [
+			"clientpocket", "clientstock", "server"
+		],
+		"destination_folders": {
+			"clientpocket": "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\2\\Docs",
+			"clientstock": "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\0\\Docs",
+			"server": "C:\\Users\\cheeh\\AppData\\Roaming\\PrismLauncher\\instances\\Optimised CCTweaked AE2\\minecraft\\saves\\Test1_CCT_AE2\\computercraft\\computer\\3\\Docs"
+		},
+		"sync_policies": [
+			{
+				"folder": "server",
+				"exclude": []
+			},
+			{
+				"folder": "clientpocket",
+				"exclude": []
+			},
+			{
+				"folder": "clientstock",
+				"exclude": []
+			}
+		],
+
+
+		"shared_folder": "common",
+		"shared_sync_policies": [
+			{
+				"folder": "utils",
+				"replicate_to_source_folders": ["clientpocket", "clientstock", "server"]
+			}
+		],
+
+		"sync_order": [
+			"shared",
+			"source-destination"
+		]
+	}
+}
