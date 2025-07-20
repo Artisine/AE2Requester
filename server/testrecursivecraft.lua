@@ -2,7 +2,7 @@
 local Logger = require("utils.simpleLogging")
 local log = Logger.new("/Docs/server-test-recursivecraft.log")
 ---@diagnostic disable-next-line: different-requires
-local inspect = require("utils/inspect")
+local inspect = require("utils.inspect")
 local meBridge = require("utils.meBridge")
 local bridge = meBridge.ensureMEBridgeExists()
 if not bridge then
@@ -50,6 +50,7 @@ local function main()
 	log("methods: ", meth)
 
 	do
+---@diagnostic disable-next-line: undefined-field
 		local thing, err = bridge.getPattern({
 			name = "minecraft:wooden_pickaxe",
 			count = 1

@@ -1,6 +1,6 @@
 
 local basalt = require("utils/basaltMin")
-local inspect = require("utils/inspect")
+local inspect = require("utils.inspect")
 local meBridge = require("utils.meBridge")
 
 
@@ -187,7 +187,7 @@ end
 -- Requires editing the Lua script dynamically.
 -- Dynamically patch cryptoNet's source to replace its local log/print functions with this file's versions
 
-local cryptoNet = require("utils/cryptoNet")
+local cryptoNet = require("utils.cryptoNet")
 
 
 
