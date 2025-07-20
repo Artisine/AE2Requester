@@ -1,6 +1,7 @@
 
 local Logger = require("utils.simpleLogging")
 local log = Logger.new("/Docs/server-test-recursivecraft.log")
+---@diagnostic disable-next-line: different-requires
 local inspect = require("utils/inspect")
 local meBridge = require("utils.meBridge")
 local bridge = meBridge.ensureMEBridgeExists()
